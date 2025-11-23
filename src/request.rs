@@ -71,21 +71,20 @@ impl Request {
     }
 
     /// Reads the body (if it hasn't been read already) and returns it
-    pub(crate) async fn read_body(&mut self) -> &Vec<u8> {
+    pub(crate) async fn read_body(&mut self) -> Result<&Vec<u8>, Error> {
         if self.body.is_none() {
             let raw_body = self.inner.body_mut();
 
             let bytes = raw_body
                 .collect()
                 .await
-                .map_err(|err| Error::new_with_context(ErrorKind::RequestBodyFailure, err))
-                .unwrap()
+                .map_err(|err| Error::new_with_context(ErrorKind::RequestBodyFailure, err))?
                 .to_bytes();
 
             self.body = Some(bytes.to_vec());
         }
 
-        self.body.as_ref().unwrap()
+        Ok(self.body.as_ref().unwrap())
     }
 
     pub(crate) fn formatted(&self) -> String {

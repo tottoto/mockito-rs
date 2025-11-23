@@ -528,7 +528,7 @@ async fn handle_request(
     state: Arc<RwLock<State>>,
 ) -> Result<Response<Body>, Error> {
     let mut request = Request::new(hyper_request);
-    request.read_body().await;
+    request.read_body().await?;
     log::debug!("Request received: {}", request.formatted());
 
     let mutex = state.clone();
